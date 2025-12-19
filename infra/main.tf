@@ -145,3 +145,33 @@ resource "aws_lambda_function" "etl_lambda" {
     aws_lambda_layer_version.common_layer.arn
   ]
 }
+
+
+# --- 10. Automation (EventBridge Scheduler) ---
+
+# 1. Rule: Kab chalna hai? (Rozana Subah 9 Bajay UTC)
+resource "aws_cloudwatch_event_rule" "daily_trigger" {
+  name        = "${var.project_name}-daily-rule"
+  description = "Triggers Lambda every day at 9 AM UTC"
+
+  # Cron Expression: (Minutes Hours Day Month Weekday Year)
+  # '0 9 * * ? *' ka matlab: Rozana 9:00 AM UTC
+  schedule_expression = "cron(15 22 * * ? *)"
+  # schedule_expression = "rate(2 minutes)"
+}
+
+# 2. Target: Kis ko chalana hai? (Humara Lambda Function)
+resource "aws_cloudwatch_event_target" "trigger_lambda" {
+  rule      = aws_cloudwatch_event_rule.daily_trigger.name
+  target_id = "lambda"
+  arn       = aws_lambda_function.etl_lambda.arn
+}
+
+# 3. Permission: EventBridge ko ijazat do k wo Lambda chala sakay
+resource "aws_lambda_permission" "allow_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.etl_lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.daily_trigger.arn
+}
