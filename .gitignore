@@ -1,0 +1,22 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# --- Terraform (Bohot Zaroori) ---
+# Terraform ki state file my apke secrets hoty hn, isy kabhi upload na karein
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# --- AWS / Data ---
+data/
+logs/
+infra/layers/  # Layers ka size bara hota hai, isy git par dalna zaroori nhi
+lambda_function.zip
+common_layer.zip
+
+# --- OS ---
+.DS_Store
