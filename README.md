@@ -13,43 +13,38 @@ This project is a fully automated ETL pipeline deployed on AWS using Terraform.
 ## 🏗 Data Pipeline Architecture
 
 ```mermaid
-graph LR
-    %% Styles
-    style EB fill:#FF9900,stroke:#333,stroke-width:2px,color:white
-    style API fill:#E1E1E1,stroke:#333,stroke-width:2px
-    style LAM fill:#FF9900,stroke:#333,stroke-width:2px,color:white
-    style S3 fill:#3F8624,stroke:#333,stroke-width:2px,color:white
-    style RAW fill:#f9f9f9,stroke:#333,stroke-dasharray: 5 5
-    style PRO fill:#f9f9f9,stroke:#333,stroke-dasharray: 5 5
-    style QUA fill:#ffcccc,stroke:#333,stroke-dasharray: 5 5
-
-    %% Nodes
-    EB(⏱️ EventBridge Scheduler<br/>Daily 9:00 AM)
-    API(☁️ External API<br/>DummyJSON)
-    
-    subgraph AWS_Cloud [AWS Cloud Environment]
+graph TD
+    %% --- Main Setup ---
+    subgraph AWS [☁️ AWS Cloud Infrastructure]
         direction LR
-        LAM(λ AWS Lambda<br/>Python 3.10 ETL)
         
-        subgraph S3_Bucket [S3 Data Lake]
-            RAW[📂 Raw Zone<br/>.json]
-            PRO[📂 Processed Zone<br/>.csv]
-            QUA[📂 Quarantine Zone<br/>Error Logs]
+        %% Nodes
+        EB("⏱️ <b>EventBridge Scheduler</b><br/>(Daily Trigger)")
+        LAM("⚙️ <b>AWS Lambda</b><br/>(Python ETL)")
+        API("🌍 <b>External API</b><br/>(DummyJSON)")
+        
+        subgraph S3 [🪣 Amazon S3 Storage]
+            RAW[📄 Raw Zone]
+            PRO[📊 Processed Zone]
+            LOG[🚫 Quarantine Zone]
         end
     end
 
-    %% Flow Connections
-    EB -- Triggers --> LAM
-    LAM -- 1. Extract Data --> API
-    API -- Return JSON --> LAM
-    LAM -- 2. Save Original --> RAW
-    LAM -- 3. Validate & Transform --> PRO
-    LAM -- If Error --> QUA
+    %% --- Connections ---
+    EB -- "1. Trigger" --> LAM
+    LAM -- "2. Fetch" --> API
+    API -- "3. Data" --> LAM
+    LAM -- "4. Store" --> RAW
+    LAM -- "5. Clean" --> PRO
+    LAM -- "6. Error" --> LOG
 
-    %% Link Styling
-    linkStyle 0 stroke:#FF9900,stroke-width:2px;
-    linkStyle 4 stroke:green,stroke-width:2px;
-    linkStyle 5 stroke:red,stroke-width:2px;
+    %% --- Styling ---
+    style EB fill:#FF4F8B,stroke:#333,color:white
+    style LAM fill:#FF9900,stroke:#333,color:white
+    style S3 fill:#3F8624,stroke:#333,color:white
+    style RAW fill:#fff,stroke:#333
+    style PRO fill:#e6fffa,stroke:#333
+    style LOG fill:#ffe6e6,stroke:#ff0000
 ```
 
 ## 🛠 Tech Stack
