@@ -50,6 +50,7 @@ graph LR
     linkStyle 0 stroke:#FF9900,stroke-width:2px;
     linkStyle 4 stroke:green,stroke-width:2px;
     linkStyle 5 stroke:red,stroke-width:2px;
+```
 
 ## 🛠 Tech Stack
 
